@@ -1,6 +1,12 @@
 <?php
 
+use Drupal\Core\Site\Settings;
+
 function vite_library_info_alter(&$libraries, $extension) {
+  if (!Settings::get('hot_module_replacement')) {
+    return;
+  }
+
   if ($extension !== 'vite') {
     return;
   }
