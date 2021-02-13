@@ -1,8 +1,9 @@
 import liveReload from 'vite-plugin-live-reload'
+import vue from '@vitejs/plugin-vue'
 
 export default {
   plugins: [
-    // vue(),
+    vue(),
     liveReload(__dirname+'/**/*.(php|inc|theme|twig)')
   ],
 

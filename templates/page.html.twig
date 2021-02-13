@@ -1,21 +1,24 @@
 <div>
-  <p>Custom Instance</p>
-  <div class="custom">
-    Inside
+  <h1>Inline Vue Instance</h1>
+  <div class="v-instance">
+    Instance 1 -
     {% verbatim %}
-      Test this {{message}}
+      Test 1: {{message}}
     {% endverbatim %}
   </div>
 
-  <div class="custom">
-    Inside
+  <div class="v-instance">
+    Instance 2 -
     {% verbatim %}
-      Test this {{message}}
+      Test 2: {{message}}
     {% endverbatim %}
   </div>
 
-  <p>Vue SFC</p>
+  <h1>Multiple Vue SFC instances</h1>
+  <div class="sfc-instance">SFC Instance 1 - Not Rendered</div>
+  <div class="sfc-instance">SFC Instance 2 - Not Rendered</div>
+
+  <h1>Single Vue SFC</h1>
   <div id="app"></div>
-
 
 </div>
