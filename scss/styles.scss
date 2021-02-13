@@ -1,0 +1,11 @@
+@import "../node_modules/breakpoint-sass/stylesheets/breakpoint";
+
+$color: green;
+
+body {
+  color: $color;
+
+  @include breakpoint(800px) {
+    color: red;
+  }
+}

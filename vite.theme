@@ -1,0 +1,31 @@
+<?php
+
+function vite_library_info_alter(&$libraries, $extension) {
+  if ($extension !== 'vite') {
+    return;
+  }
+
+  foreach ($libraries as $library => $settings) {
+    foreach ($settings['css'] as $type => $paths) {
+      foreach ($paths as $path => $options) {
+        _vite_replace_library($libraries[$library]['css'][$type], $path, $options);
+      }
+    }
+
+    foreach ($settings['js'] as $path => $options) {
+      _vite_replace_library($libraries[$library]['js'], $path, $options);
+    }
+  }
+}
+
+function _vite_replace_library(&$library, $path, $options) {
+  // Ignore external paths
+  if (!preg_match('/^(http|:\/\/)/', $path)) {
+    // Prepend the local development url.
+    unset($library[$path]);
+    $path = preg_replace('/^\/?dist/', 'http://localhost:12321', $path);
+    $options['type'] = 'external';
+    $options['crossorigin'] = TRUE;
+    $library[$path] = $options;
+  }
+}

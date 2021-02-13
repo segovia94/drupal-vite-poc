@@ -1,0 +1,14 @@
+# "dist" will be replaced with "http://localhost:12321" in development
+global-styling:
+  css:
+    theme:
+      dist/scss/styles.scss: {}
+  js:
+    dist/js/main.js: { attributes: { type: 'module'}}
+  dependencies:
+    - core/jquery
+
+hot-module-replacement:
+  header: true
+  js:
+    http://localhost:12321/@vite/client: {type: external, attributes: { type: 'module'}}

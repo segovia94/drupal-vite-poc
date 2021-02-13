@@ -1,0 +1,19 @@
+name: Vite
+type: theme
+base theme: classy
+description: 'A Demo for using Vite dev server.'
+package: Core
+core: 8.x
+libraries:
+  - vite/global-styling
+  - vite/hot-module-replacement
+
+regions:
+  header: Header
+  primary_menu: 'Primary menu'
+  highlighted: Highlighted
+  breadcrumb: Breadcrumb
+  content: Content
+  sidebar_first: 'Sidebar first'
+  sidebar_second: 'Sidebar second'
+  footer: 'Footer'
