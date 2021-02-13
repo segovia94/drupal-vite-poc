@@ -2,36 +2,50 @@
 
 use Drupal\Core\Site\Settings;
 
-function vite_library_info_alter(&$libraries, $extension) {
-  if (!Settings::get('hot_module_replacement')) {
-    return;
+/**
+ * Implements hook_library_info_build().
+ */
+function vite_library_info_build() {
+  $libraries = [];
+
+  // Production directory.
+  $dir = 'dist';
+
+  // Local development with Vite
+  if (Settings::get('hot_module_replacement')) {
+    $dir = 'http://localhost:12321';
+    $css_options = [
+      'type' => 'external',
+    ];
+    $js_options = [
+      'type' => 'external',
+      'attributes' => [
+        'type' => 'module',
+        'crossorigin' => TRUE,
+      ],
+    ];
+
+    // Add a library whose information changes depending on certain conditions.
+    $libraries['hot-module-replacement'] = [
+      'js' => [
+        "${dir}/@vite/client" => $js_options,
+      ],
+    ];
+
+    $libraries['global-styling'] = [
+      'css' => [
+        'theme' => [
+          "${dir}/scss/styles.scss" => $css_options,
+        ]
+      ],
+      'js' => [
+        "${dir}/js/main.js" => $js_options,
+      ],
+      'dependencies' => [
+        'core/jquery'
+      ]
+    ];
   }
 
-  if ($extension !== 'vite') {
-    return;
-  }
-
-  foreach ($libraries as $library => $settings) {
-    foreach ($settings['css'] as $type => $paths) {
-      foreach ($paths as $path => $options) {
-        _vite_replace_library($libraries[$library]['css'][$type], $path, $options);
-      }
-    }
-
-    foreach ($settings['js'] as $path => $options) {
-      _vite_replace_library($libraries[$library]['js'], $path, $options);
-    }
-  }
-}
-
-function _vite_replace_library(&$library, $path, $options) {
-  // Ignore external paths
-  if (!preg_match('/^(http|:\/\/)/', $path)) {
-    // Prepend the local development url.
-    unset($library[$path]);
-    $path = preg_replace('/^\/?dist/', 'http://localhost:12321', $path);
-    $options['type'] = 'external';
-    $options['crossorigin'] = TRUE;
-    $library[$path] = $options;
-  }
+  return $libraries;
 }

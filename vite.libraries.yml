@@ -1,14 +1,11 @@
-# "dist" will be replaced with "http://localhost:12321" in development
-global-styling:
-  css:
-    theme:
-      dist/scss/styles.scss: {}
-  js:
-    dist/js/main.js: { attributes: { type: 'module'}}
-  dependencies:
-    - core/jquery
+# Libraries are now programatically created with hook_library_info_build.
 
-hot-module-replacement:
-  header: true
-  js:
-    http://localhost:12321/@vite/client: {type: external, attributes: { type: 'module'}}
+# "dist" will be replaced with "http://localhost:12321" in development
+#global-styling:
+#  css:
+#    theme:
+#      dist/scss/styles.scss: {}
+#  js:
+#    dist/js/main.js: { attributes: { type: 'module'}}
+#  dependencies:
+#    - core/jquery
