@@ -7,12 +7,21 @@ use Drupal\Core\Site\Settings;
  */
 function vite_library_info_build() {
   $libraries = [];
+  $local = Settings::get('hot_module_replacement');
 
-  // Production directory.
+  // Production settings.
   $dir = 'dist';
+  $css_options = [];
+  $js_options = [
+    'attributes' => [
+      'type' => 'module',
+    ],
+  ];
+
+  $global_css = 'css/styles.css';
 
   // Local development with Vite
-  if (Settings::get('hot_module_replacement')) {
+  if ($local) {
     $dir = 'http://localhost:12321';
     $css_options = [
       'type' => 'external',
@@ -25,27 +34,33 @@ function vite_library_info_build() {
       ],
     ];
 
+    $global_css = 'scss/styles.scss';
+
     // Add a library whose information changes depending on certain conditions.
     $libraries['hot-module-replacement'] = [
+      'header' => TRUE,
       'js' => [
         "${dir}/@vite/client" => $js_options,
       ],
     ];
-
-    $libraries['global-styling'] = [
-      'css' => [
-        'theme' => [
-          "${dir}/scss/styles.scss" => $css_options,
-        ]
-      ],
-      'js' => [
-        "${dir}/js/main.js" => $js_options,
-      ],
-      'dependencies' => [
-        'core/jquery'
-      ]
-    ];
   }
+
+  $libraries['global-styling'] = [
+    'css' => [
+      'theme' => [
+        "${dir}/${global_css}" => $css_options,
+      ]
+    ]
+  ];
+
+  $libraries['global-js'] = [
+    'js' => [
+      "${dir}/js/main.js" => $js_options,
+    ],
+    'dependencies' => [
+      'core/jquery'
+    ]
+  ];
 
   return $libraries;
 }

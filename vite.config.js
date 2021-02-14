@@ -18,9 +18,9 @@ export default {
       ],
       // Remove the [hash] since Drupal will take care of that.
       output: {
-        entryFileNames: `js/[name].js`,
-        chunkFileNames: `js/[name].js`,
-        assetFileNames: `scss/[name].[ext]`
+        // entryFileNames: `js/[name].js`,
+        // chunkFileNames: `js/[name].js`,
+        assetFileNames: `css/[name].[ext]`
       }
     }
   },

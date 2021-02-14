@@ -6,6 +6,7 @@ package: Core
 core: 8.x
 libraries:
   - vite/global-styling
+  - vite/global-js
   - vite/hot-module-replacement
 
 regions:
