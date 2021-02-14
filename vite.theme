@@ -3,64 +3,101 @@
 use Drupal\Core\Site\Settings;
 
 /**
- * Implements hook_library_info_build().
+ * Implements hook_library_info_alter().
  */
-function vite_library_info_build() {
-  $libraries = [];
-  $local = Settings::get('hot_module_replacement');
-
-  // Production settings.
-  $dir = 'dist';
-  $css_options = [];
-  $js_options = [
-    'attributes' => [
-      'type' => 'module',
-    ],
-  ];
-
-  $global_css = 'css/styles.css';
-
-  // Local development with Vite
-  if ($local) {
-    $dir = 'http://localhost:12321';
-    $css_options = [
-      'type' => 'external',
-    ];
-    $js_options = [
-      'type' => 'external',
-      'attributes' => [
-        'type' => 'module',
-        'crossorigin' => TRUE,
-      ],
-    ];
-
-    $global_css = 'scss/styles.scss';
-
-    // Add a library whose information changes depending on certain conditions.
-    $libraries['hot-module-replacement'] = [
-      'header' => TRUE,
-      'js' => [
-        "${dir}/@vite/client" => $js_options,
-      ],
-    ];
+function vite_library_info_alter(&$libraries, $extension) {
+  if ($extension !== 'vite') {
+    return;
   }
 
-  $libraries['global-styling'] = [
-    'css' => [
-      'theme' => [
-        "${dir}/${global_css}" => $css_options,
-      ]
-    ]
-  ];
+  $local = Settings::get('hot_module_replacement');
 
-  $libraries['global-js'] = [
-    'js' => [
-      "${dir}/js/main.js" => $js_options,
-    ],
-    'dependencies' => [
-      'core/jquery'
-    ]
-  ];
+  // Replace library paths so they are ready for either Dev or Prd.
+  foreach ($libraries as $library => $settings) {
+    foreach ($settings['css'] as $type => $paths) {
+      foreach ($paths as $path => $options) {
+        _vite_replace_library($libraries[$library]['css'][$type], $path, $options);
+      }
+    }
 
-  return $libraries;
+    foreach ($settings['js'] as $path => $options) {
+      _vite_replace_library($libraries[$library]['js'], $path, $options);
+    }
+  }
+
+  // Exit if local development. Everything after will be for production.
+  if ($local) {
+    return;
+  }
+
+  // Remove the HMR client library.
+  unset($libraries['hot-module-replacement']);
+
+  // Read the production Manifest file to find CSS files imported via JS files.
+  $manifest_file = file_get_contents(__DIR__  . '/dist/manifest.json');
+  $manifest = json_decode($manifest_file);
+
+  foreach ($manifest as $key => $data) {
+    // Ignore files that will be imported via js.
+    if (preg_match('/^_/', $key)) {
+      continue;
+    }
+
+    if (!empty($data->css)) {
+      foreach ($data->css as $css_file) {
+        // Search through each library.
+        foreach ($libraries as $library => $settings) {
+          foreach ($settings['js'] as $path => $options) {
+            $js_path = 'dist/' . $data->file;
+            if ($path == $js_path) {
+              $libraries[$library]['css']['component']["dist/${css_file}"] = [];
+            }
+          }
+        }
+      }
+    }
+  }
+
+}
+
+/**
+ * Replace an asset path with one that works with Vite.
+ *
+ * @param array $library
+ *   The library to be altered.
+ * @param string $path
+ *   The file path and name.
+ * @param array $options
+ *   Any settings that were part of the original file's settings.
+ */
+function _vite_replace_library(array &$library, string $path, array $options): void {
+  // Ignore external paths
+  if (preg_match('/^(http|:\/\/)/', $path)) {
+    return;
+  }
+
+  $local = Settings::get('hot_module_replacement');
+  $dir = 'dist';
+
+  // Remove the old library info.
+  unset($library[$path]);
+
+  if ($local) {
+    $dir = 'http://localhost:12321';
+    $options['type'] = 'external';
+    if (preg_match('/.m?js$/', $path)) {
+      $options['crossorigin'] = TRUE;
+    }
+  }
+  else {
+    // Convert .scss files to .css
+    $path = preg_replace('/.s[ac]ss$/', '.css', $path);
+    // Strip off all but the filename.
+    $path = basename($path);
+  }
+
+  // Prepend the local development url.
+  $path = "${dir}/${path}";
+  // Add in the new altered library.
+  $library[$path] = $options;
 }

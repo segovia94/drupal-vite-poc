@@ -1,11 +1,17 @@
-# Libraries are now programatically created with hook_library_info_build.
+# Use the source path instead of destination. "scss/styles.scss" instead of "dist/css".
+# Paths will be altered for local or prod with hook_library_info_alter().
+global-styling:
+  css:
+    theme:
+      scss/styles.scss: {}
 
-# "dist" will be replaced with "http://localhost:12321" in development
-#global-styling:
-#  css:
-#    theme:
-#      dist/scss/styles.scss: {}
-#  js:
-#    dist/js/main.js: { attributes: { type: 'module'}}
-#  dependencies:
-#    - core/jquery
+global-js:
+  js:
+    js/main.js: { attributes: { type: 'module'}}
+  dependencies:
+    - core/jquery
+
+hot-module-replacement:
+  header: true
+  js:
+    http://localhost:12321/@vite/client: {type: external, attributes: { type: 'module'}}
