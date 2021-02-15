@@ -1,7 +1,7 @@
 <template>
   <div class="App">
     <header class="App-header">
-      <div class="App-logo">This is a test</div>
+      <img :src="`${root}/images/logo.svg`" class="App-logo" alt="logo" />
       <p>
         Edit
         <code>src/App.vue</code> and save to reload.
@@ -20,7 +20,8 @@
 export default {
   data() {
     return {
-      message: "Learn Vue"
+      message: "Learn Vue",
+      root: drupalSettings.path.themeUrl
     };
   }
 };

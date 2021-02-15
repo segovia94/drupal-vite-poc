@@ -101,3 +101,10 @@ function _vite_replace_library(array &$library, string $path, array $options): v
   // Add in the new altered library.
   $library[$path] = $options;
 }
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function vite_preprocess_html(&$variables) {
+  $variables['#attached']['drupalSettings']['path']['themeUrl'] = \Drupal::theme()->getActiveTheme()->getPath();
+}
