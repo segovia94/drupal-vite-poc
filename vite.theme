@@ -14,14 +14,18 @@ function vite_library_info_alter(&$libraries, $extension) {
 
   // Replace library paths so they are ready for either Dev or Prd.
   foreach ($libraries as $library => $settings) {
-    foreach ($settings['css'] as $type => $paths) {
-      foreach ($paths as $path => $options) {
-        _vite_replace_library($libraries[$library]['css'][$type], $path, $options);
+    if (isset($settings['css'])) {
+      foreach ($settings['css'] as $type => $paths) {
+        foreach ($paths as $path => $options) {
+          _vite_replace_library($libraries[$library]['css'][$type], $path, $options);
+        }
       }
     }
-
-    foreach ($settings['js'] as $path => $options) {
-      _vite_replace_library($libraries[$library]['js'], $path, $options);
+    
+    if (isset($settings['js'])) {
+      foreach ($settings['js'] as $path => $options) {
+        _vite_replace_library($libraries[$library]['js'], $path, $options);
+      }
     }
   }
 
